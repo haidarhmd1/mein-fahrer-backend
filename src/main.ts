@@ -1,8 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-
-const PORT: number = 3000;
+import { appConfig } from '../config/appConfig';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,9 +12,10 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('meinfahrer')
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(PORT);
+  await app.listen(appConfig.PORT || 4000);
 }
 bootstrap();

@@ -1,9 +1,12 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
-import { IXanoUserArray } from '../models/notification.dto';
+import {
+  XanoRequestBodyDto,
+  XanoUserResponseArrayDto,
+} from '../../models/notification.dto';
 import { AxiosResponse } from 'axios';
-import { OneSignalPushService } from '../one-signal-push/one-signal-push.service';
+import { OneSignalPushService } from '../../common/services/one-signal-push/one-signal-push.service';
 
 const apiKey = 'BZjiyDT6';
 const baseUrl = `https://api.bemany.world/api:${apiKey}`;
@@ -19,33 +22,46 @@ export class NotificationService {
     return 'get notification';
   }
 
-  public async postToExternalXanoApi({
-    driverFirstName,
-    companyEmail,
-  }: {
-    driverFirstName: string;
-    companyEmail: string;
-  }) {
-    const URL = `${baseUrl}/dispatcher/get-driver?company_email=${companyEmail}&driver_first_name=${driverFirstName}`;
-    try {
-      const response: AxiosResponse<IXanoUserArray> = await firstValueFrom(
-        this.httpService.get(URL),
+  public async postToExternalXanoApi(XanoUserBody: XanoRequestBodyDto) {
+    const URL_POST = `${baseUrl}/dispatcher/uber-rides`;
+    const URL = `${baseUrl}/dispatcher/get-driver?company_email=${XanoUserBody.unternehmen}&driver_first_name=${XanoUserBody.fahrer}`;
+
+    const response: AxiosResponse<XanoUserResponseArrayDto> =
+      await firstValueFrom(this.httpService.get(URL));
+
+    await this.oneSignalPushService.sendOneSignalPushNotification(
+      response.data[0].email,
+      `Preis: ${XanoUserBody.preis}
+       Abholort: ${XanoUserBody.abholadresse}
+       Zieladresse: ${XanoUserBody.zieladresse}
+       Entfernung: ${XanoUserBody.entfernung}
+       Firma: ${XanoUserBody.unternehmen}
+       Fahrer: ${XanoUserBody.fahrer}
+       Fahrer ID: ${response.data[0].id}`,
+    );
+
+    const responsePost: AxiosResponse<any> = await firstValueFrom(
+      this.httpService.post(URL_POST, {
+        driver_first_name: XanoUserBody.fahrer,
+        driver_id: response.data[0].id,
+        companys_id: response.data[0].companys_id,
+        pickup: XanoUserBody.abholadresse,
+        destination: XanoUserBody.zieladresse,
+        price: XanoUserBody.preis,
+        distance: XanoUserBody.entfernung,
+      }),
+    );
+
+    if (responsePost.status !== 200) {
+      throw new HttpException(
+        "something wen't wrong :/",
+        HttpStatus.BAD_REQUEST,
       );
-
-      // if (response.status !== 200) {
-      //   // TODO: add to xano db
-      // }
-
-      // TODO: send to oneSignal
-      await this.oneSignalPushService.sendOneSignalPushNotification(
-        response.data[0].onesignal_identifier,
-      );
-
-      return {
-        success: true,
-      };
-    } catch (error) {
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
+
+    return {
+      success: true,
+      response: responsePost.data,
+    };
   }
 }

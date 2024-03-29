@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
-import { appConfig } from 'src/config/appConfig';
+import { appConfig } from 'config/appConfig';
 
 // Your REST API Key and App ID
 const YOUR_REST_API_KEY = appConfig.ONESIGNAL_REST_API_KEY;
@@ -12,14 +12,18 @@ const YOUR_APP_ID = appConfig.ONESIGNAL_APP_ID;
 export class OneSignalPushService {
   constructor(private readonly httpService: HttpService) {}
 
-  public async sendOneSignalPushNotification(oneSignalIdList: string[]) {
+  public async sendOneSignalPushNotification(
+    oneSignalExternalEmailId: string,
+    messageBody: any,
+  ) {
     const notificationData = {
       app_id: YOUR_APP_ID,
-      contents: { en: 'Hello' },
-      headings: { en: 'English' },
-      //   included_segments: ['Total Subscriptions'],
+      contents: {
+        en: messageBody,
+      },
+      headings: { en: 'Neue Fahrt 🚀' },
       include_aliases: {
-        external_id: ['aabca699-c571-4c8a-af65-53d289fe8fbc'],
+        external_id: [oneSignalExternalEmailId],
       },
       target_channel: 'push',
     };
@@ -37,6 +41,7 @@ export class OneSignalPushService {
           },
         ),
       );
+
       if (response.data.errors) {
         throw new Error(response.data.errors);
       }
