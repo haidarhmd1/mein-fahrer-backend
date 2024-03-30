@@ -2,22 +2,25 @@ import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
-import { appConfig } from 'config/appConfig';
-
-// Your REST API Key and App ID
-const YOUR_REST_API_KEY = appConfig.ONESIGNAL_REST_API_KEY;
-const YOUR_APP_ID = appConfig.ONESIGNAL_APP_ID;
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OneSignalPushService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly httpService: HttpService,
+  ) {}
+
+  // Your REST API Key and App ID
+  YOUR_REST_API_KEY = this.configService.get('ONESIGNAL_REST_API_KEY');
+  YOUR_APP_ID = this.configService.get('ONESIGNAL_APP_ID');
 
   public async sendOneSignalPushNotification(
     oneSignalExternalEmailId: string,
     messageBody: any,
   ) {
     const notificationData = {
-      app_id: YOUR_APP_ID,
+      app_id: this.YOUR_APP_ID,
       contents: {
         en: messageBody,
       },
@@ -36,7 +39,7 @@ export class OneSignalPushService {
           {
             headers: {
               'Content-Type': 'application/json; charset=utf-8',
-              Authorization: `Basic ${YOUR_REST_API_KEY}`,
+              Authorization: `Basic ${this.YOUR_REST_API_KEY}`,
             },
           },
         ),

@@ -7,24 +7,26 @@ import {
 } from '../../models/notification.dto';
 import { AxiosResponse } from 'axios';
 import { OneSignalPushService } from '../../common/services/one-signal-push/one-signal-push.service';
-
-const apiKey = 'BZjiyDT6';
-const baseUrl = `https://api.bemany.world/api:${apiKey}`;
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class NotificationService {
   constructor(
+    private readonly configService: ConfigService,
     private readonly httpService: HttpService,
     private readonly oneSignalPushService: OneSignalPushService,
   ) {}
+
+  apiKey = this.configService.get('BEMANY_API_KEY');
+  baseUrl = `https://api.bemany.world/api:${this.apiKey}`;
 
   getNotification() {
     return 'get notification';
   }
 
   public async postToExternalXanoApi(XanoUserBody: XanoRequestBodyDto) {
-    const URL_POST = `${baseUrl}/dispatcher/uber-rides`;
-    const URL = `${baseUrl}/dispatcher/get-driver?company_email=${XanoUserBody.unternehmen}&driver_first_name=${XanoUserBody.fahrer}`;
+    const URL_POST = `${this.baseUrl}/dispatcher/uber-rides`;
+    const URL = `${this.baseUrl}/dispatcher/get-driver?company_email=${XanoUserBody.unternehmen}&driver_first_name=${XanoUserBody.fahrer}`;
 
     const response: AxiosResponse<XanoUserResponseArrayDto> =
       await firstValueFrom(this.httpService.get(URL));
