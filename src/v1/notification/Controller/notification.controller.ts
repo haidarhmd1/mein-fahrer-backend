@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
 import { NotificationService } from '../Service/notification.service';
-import { XanoRequestBodyDto } from 'src/models/notification.dto';
-import { apiPrefix } from 'src/utils/const';
+import { XanoRequestBodyDto } from 'src/v1/models/notification.dto';
+import { apiPrefix } from 'src/utils/constants';
 
 const VERSION = 1;
 const CONTROLLER_PREFIX = apiPrefix(VERSION).url_prefix;
