@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import {
   XanoRequestBodyDto,
   XanoUserResponseArrayDto,
-} from '../../../models/notification.dto';
+} from '../../models/notification.dto';
 import { AxiosResponse } from 'axios';
 import { OneSignalPushService } from '../../../common/services/one-signal-push/one-signal-push.service';
 import { ConfigService } from '@nestjs/config';
