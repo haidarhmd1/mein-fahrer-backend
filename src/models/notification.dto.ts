@@ -19,6 +19,18 @@ export class XanoUserResponseDto {
   _company: CompanyDto;
 }
 
+export class XanoNotificationDispatcherDto {
+  id: number;
+  created_at: number;
+  driver_first_name: string;
+  driver_id: number;
+  companys_id: number;
+  pickup: string;
+  destination: string;
+  price: string;
+  distance: string;
+}
+
 export class XanoRequestBodyDto {
   @ApiProperty()
   @IsNotEmpty()
