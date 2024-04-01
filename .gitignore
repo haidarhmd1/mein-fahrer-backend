@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+local
 
 # Logs
 logs
@@ -36,3 +37,4 @@ lerna-debug.log*
 
 # Files
 env.ts
+.env

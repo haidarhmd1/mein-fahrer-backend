@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
 export class CompanyDto {
@@ -19,16 +20,27 @@ export class XanoUserResponseDto {
 }
 
 export class XanoRequestBodyDto {
+  @ApiProperty()
   @IsNotEmpty()
   unternehmen: string;
+
+  @ApiProperty()
   @IsNotEmpty()
   preis: string;
+
+  @ApiProperty()
   @IsNotEmpty()
   abholadresse: string;
+
+  @ApiProperty()
   @IsNotEmpty()
   zieladresse: string;
+
+  @ApiProperty()
   @IsNotEmpty()
   entfernung: string;
+
+  @ApiProperty()
   @IsNotEmpty()
   fahrer: string;
 }
