@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { NotificationModule } from './v1/notification/notification.module';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './v2/users/users.module';
+// import { AuthModule } from './auth/auth.module';
+// import { UsersModule } from './v2/users/users.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -11,8 +11,8 @@ import { AppController } from './app.controller';
       isGlobal: true,
     }),
     NotificationModule,
-    AuthModule,
-    UsersModule,
+    // AuthModule,
+    // UsersModule,
   ],
   controllers: [AppController],
 })
