@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
 import { NotificationService } from '../Service/notification.service';
-import {
-  XanoNotificationDispatcherDto,
-  XanoRequestBodyDto,
-} from 'src/models/notification.dto';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { XanoRequestBodyDto } from 'src/v1/models/notification.dto';
+import { apiPrefix } from 'src/utils/constants';
 
-@Controller('notification')
+const VERSION = 1;
+const CONTROLLER_PREFIX = apiPrefix(VERSION).url_prefix;
+
+@Controller(CONTROLLER_PREFIX + '/notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
@@ -15,10 +15,6 @@ export class NotificationController {
     return this.notificationService.getNotification();
   }
 
-  @ApiOkResponse({
-    description: '',
-    type: XanoNotificationDispatcherDto,
-  })
   @Post('dispatcher')
   notification(@Body(new ValidationPipe()) body: XanoRequestBodyDto) {
     return this.notificationService.postToExternalXanoApi(body);
