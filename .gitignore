@@ -40,3 +40,6 @@ lerna-debug.log*
 
 # local-data
 local
+
+# migrations
+src/database/migrations

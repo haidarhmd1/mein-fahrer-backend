@@ -6,7 +6,6 @@ WORKDIR /app
 
 # Install app dependencies
 COPY package.json tsconfig.json yarn.lock ./
-COPY prisma ./prisma
 
 FROM base AS dev
 ENV NODE_ENV=dev

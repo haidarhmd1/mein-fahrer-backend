@@ -1,7 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
-import { UsersService } from '../v2/users/users.service';
+import * as bcrypt from 'bcrypt';
+import { User } from 'src/routes/v2/users/entities/user.entity';
+import { UsersService } from 'src/routes/v2/users/users.service';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { SALT_ROUNDS } from 'src/common/constants/constants';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -10,19 +18,38 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(email);
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
-      return result;
+  async validateUser(email: string, pass: string): Promise<User | null> {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
-    return null;
+
+    const isMatch = await bcrypt.compare(pass, user.password);
+
+    if (!isMatch) {
+      throw new UnauthorizedException('Wrong Password');
+    }
+
+    return user;
   }
 
-  async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+  async login(loginUserDto: LoginUserDto): Promise<{
+    accessToken: string;
+  }> {
+    const { email, password } = loginUserDto;
+    const user = await this.validateUser(email, password);
+    const payload = { email: user.email, id: user.id };
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken: await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET,
+      }),
     };
+  }
+
+  async register(registerUserDto: RegisterUserDto): Promise<User> {
+    const { email, password } = registerUserDto;
+    const hashedPass = await bcrypt.hash(password, SALT_ROUNDS);
+    return this.usersService.create(email, hashedPass);
   }
 }

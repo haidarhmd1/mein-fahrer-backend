@@ -1,12 +1,8 @@
 import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
-import { NotificationService } from '../Service/notification.service';
-import { XanoRequestBodyDto } from 'src/v1/models/notification.dto';
-import { apiPrefix } from 'src/utils/constants';
+import { NotificationService } from './notification.service';
+import { XanoRequestBodyDto } from 'src/routes/v1/models/notification.dto';
 
-const VERSION = 1;
-const CONTROLLER_PREFIX = apiPrefix(VERSION).url_prefix;
-
-@Controller(CONTROLLER_PREFIX + '/notification')
+@Controller({ version: '1', path: 'notification' })
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 

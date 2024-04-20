@@ -1,19 +1,17 @@
 import { Module } from '@nestjs/common';
-import { NotificationModule } from './v1/notification/notification.module';
+import { NotificationModule } from './routes/v1/notification/notification.module';
 import { ConfigModule } from '@nestjs/config';
-// import { AuthModule } from './auth/auth.module';
-// import { UsersModule } from './v2/users/users.module';
-import { AppController } from './app.controller';
+import { UsersModule } from './routes/v2/users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    DatabaseModule,
     NotificationModule,
-    // AuthModule,
-    // UsersModule,
+    UsersModule,
+    AuthModule,
   ],
-  controllers: [AppController],
 })
 export class AppModule {}
