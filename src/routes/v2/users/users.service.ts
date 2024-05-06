@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { SALT_ROUNDS } from 'src/common/constants/constants';
+import { UserRole } from 'src/common/types/user';
 
 @Injectable()
 export class UsersService {
@@ -13,12 +18,29 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async create(email: string, password: string): Promise<User> {
-    const newUser = this.usersRepository.create({
-      email,
-      password,
-    });
-    return this.usersRepository.save(newUser);
+  async create(
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    role = UserRole.USER,
+  ): Promise<User> {
+    try {
+      const newUser = this.usersRepository.create({
+        email,
+        password,
+        firstName,
+        lastName,
+        role,
+      });
+      return await this.usersRepository.save(newUser);
+    } catch (error) {
+      if (error.code === '23505') {
+        // PostgreSQL unique constraint violation code
+        throw new ConflictException('User with this email already exists');
+      }
+      throw error; // Re-throw other errors
+    }
   }
 
   async updatePassword(id: string, password: string) {

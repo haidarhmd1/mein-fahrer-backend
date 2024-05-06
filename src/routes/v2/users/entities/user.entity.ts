@@ -6,7 +6,10 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { Company } from '../../company/entities/company.entity';
+import { UserRole } from 'src/common/types/user';
 
 @Entity('users')
 export class User {
@@ -30,6 +33,16 @@ export class User {
   @Column()
   @IsNotEmpty()
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
+
+  @ManyToOne(() => Company, (company) => company.users)
+  company: Company;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

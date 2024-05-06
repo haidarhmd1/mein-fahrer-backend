@@ -1,4 +1,7 @@
+import { UserRole } from './user';
+
 export type JwtPayload = {
-  email: string;
   id: string;
+  email: string;
+  role: UserRole;
 };
