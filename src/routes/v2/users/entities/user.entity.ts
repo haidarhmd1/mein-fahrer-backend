@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsPhoneNumber } from 'class-validator';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,13 +6,18 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   UpdateDateColumn,
-  ManyToOne,
+  BaseEntity,
+  OneToOne,
 } from 'typeorm';
-import { Company } from '../../company/entities/company.entity';
-import { UserRole } from 'src/common/types/user';
+import { FamilyStatus, GenderRole, UserRole } from 'src/common/types/user';
+import { WorkInformation } from '../../work-information/entities/work-information.entity';
+import { BankingInformation } from '../../banking-information/entities/banking-information.entity';
+import { DrivingLicenseInformation } from '../../driving-license-information/entities/driving-license-information.entity';
+import { TaxInsuranceInformation } from '../../tax-insurance-information/entities/tax-insurance-information.entity';
+import { CarMaintenance } from '../../car-maintenance/entities/car-maintenance.entity';
 
 @Entity('users')
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -30,9 +35,36 @@ export class User {
   @IsEmail()
   email: string;
 
+  @Column({ nullable: true })
+  @IsPhoneNumber()
+  phoneNumber: string;
+
+  @Column({ nullable: true })
+  dob: string;
+
+  @Column({ nullable: true })
+  placeOfBirth: string;
+
+  @Column({ nullable: true })
+  nationality: string;
+
   @Column()
   @IsNotEmpty()
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: GenderRole,
+    default: GenderRole.MALE,
+  })
+  gender: GenderRole;
+
+  @Column({
+    type: 'enum',
+    enum: FamilyStatus,
+    default: FamilyStatus.OTHER,
+  })
+  familyStatus: FamilyStatus;
 
   @Column({
     type: 'enum',
@@ -40,9 +72,6 @@ export class User {
     default: UserRole.USER,
   })
   role: UserRole;
-
-  @ManyToOne(() => Company, (company) => company.users)
-  company: Company;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
@@ -52,4 +81,34 @@ export class User {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
+
+  // Define OneToOne relationships without foreign key columns
+  @OneToOne(() => WorkInformation, (workInformation) => workInformation.user, {
+    cascade: true,
+  })
+  workInformation: WorkInformation;
+
+  @OneToOne(
+    () => BankingInformation,
+    (bankingInformation) => bankingInformation.user,
+    { cascade: true },
+  )
+  bankingInformation: BankingInformation;
+
+  @OneToOne(
+    () => DrivingLicenseInformation,
+    (drivingLicenseInformation) => drivingLicenseInformation.user,
+    { cascade: true },
+  )
+  drivingLicenseInformation: DrivingLicenseInformation;
+
+  @OneToOne(
+    () => TaxInsuranceInformation,
+    (taxInsuranceInformation) => taxInsuranceInformation.user,
+    { cascade: true },
+  )
+  taxInsuranceInformation: TaxInsuranceInformation;
+
+  @OneToOne(() => CarMaintenance, { cascade: true })
+  carMaintenance: CarMaintenance;
 }

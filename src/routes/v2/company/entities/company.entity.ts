@@ -1,6 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity('companies')
 export class Company {
@@ -16,7 +15,4 @@ export class Company {
 
   @Column({ default: false })
   active: boolean;
-
-  @OneToMany(() => User, (user) => user.company)
-  users: User[];
 }

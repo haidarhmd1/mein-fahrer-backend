@@ -41,7 +41,6 @@ export class AuthService {
     email: string;
     firstName: string;
     lastName: string;
-    company: string;
     role: UserRole;
   }> {
     const { email, password } = loginUserDto;
@@ -53,7 +52,6 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
-      company: user.company?.name || '',
       accessToken,
     };
   }

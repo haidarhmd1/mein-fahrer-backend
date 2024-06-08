@@ -11,12 +11,12 @@ import {
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { Roles, RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/guards/roles.guard';
 import { UserRole } from 'src/common/types/user';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Controller({ version: '2', path: 'company' })
+@UseGuards(JwtAuthGuard)
+@Controller('company')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
