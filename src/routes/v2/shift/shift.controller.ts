@@ -16,9 +16,17 @@ import { UserCompanyService } from '../user-company/user-company.service';
 import { CarsService } from '../cars/cars.service';
 import { UsersService } from '../users/users.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
-@Controller('shift')
+@ApiTags('shifts')
+@ApiBearerAuth()
+@Controller('shifts')
 export class ShiftController {
   constructor(
     private readonly shiftService: ShiftService,
@@ -28,6 +36,8 @@ export class ShiftController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a shift' })
+  @ApiOkResponse({ description: 'Shift created successfully' })
   async create(@Body() createShiftDto: CreateShiftDto) {
     const { carId, userCompanyId } = createShiftDto;
 
@@ -42,16 +52,22 @@ export class ShiftController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all shifts' })
+  @ApiOkResponse({ description: 'Shifts retrieved successfully' })
   async findAll() {
     return await this.shiftService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a shift by ID' })
+  @ApiOkResponse({ description: 'Shift retrieved successfully' })
   async findOne(@Param('id') id: string) {
     return await this.shiftService.findOne(id);
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update a shift by ID' })
+  @ApiOkResponse({ description: 'Shift updated successfully' })
   async update(
     @Param('id') id: string,
     @Body() updateShiftDto: UpdateShiftDto,
@@ -60,11 +76,15 @@ export class ShiftController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a shift by ID' })
+  @ApiOkResponse({ description: 'Shift deleted successfully' })
   async remove(@Param('id') id: string) {
     return await this.shiftService.remove(id);
   }
 
-  @Get('/users/:userId/shifts')
+  @Get('/users/:userId')
+  @ApiOperation({ summary: 'Get shifts by user ID' })
+  @ApiOkResponse({ description: 'Shifts retrieved successfully' })
   async findShiftsByUser(@Param('userId') userId: string) {
     const user = await this.userService.findOne(userId);
     if (!user) {

@@ -15,7 +15,7 @@ async function bootstrap() {
     .setTitle('Mein Fahrer App')
     .setDescription('Mein Fahrer App API Docs')
     .setVersion('1.0')
-    .addTag('meinfahrer')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

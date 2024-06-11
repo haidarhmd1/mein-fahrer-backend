@@ -13,7 +13,15 @@ import { CreateWorkInformationDto } from './dto/create-work-information.dto';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { UpdateWorkInformationDto } from './dto/update-work-information.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 
+@ApiTags('users')
+@ApiBearerAuth()
 @Controller('users/:userId/work-information')
 @UseGuards(JwtAuthGuard, UserGuard)
 export class WorkInformationController {
@@ -22,6 +30,11 @@ export class WorkInformationController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create work information for a user' })
+  @ApiOkResponse({
+    description: 'Work information created successfully',
+    type: CreateWorkInformationDto,
+  })
   async create(
     @Param('userId') userId: string,
     @Body() createWorkInformationDto: CreateWorkInformationDto,
@@ -33,11 +46,21 @@ export class WorkInformationController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Retrieve work information for a user' })
+  @ApiOkResponse({
+    description: 'Work information retrieved successfully',
+    type: CreateWorkInformationDto,
+  })
   async findOne(@Param('userId') userId: string) {
     return await this.workInformationService.findOneByUser(userId);
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update work information for a user' })
+  @ApiOkResponse({
+    description: 'Work information updated successfully',
+    type: CreateWorkInformationDto,
+  })
   async update(
     @Param('id') id: string,
     @Param('userId') userId: string,
@@ -51,6 +74,10 @@ export class WorkInformationController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete work information for a user' })
+  @ApiOkResponse({
+    description: 'Work information deleted successfully',
+  })
   remove(@Param('id') id: string) {
     return this.workInformationService.remove(id);
   }

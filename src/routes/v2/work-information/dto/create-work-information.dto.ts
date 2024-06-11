@@ -1,20 +1,48 @@
-import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateWorkInformationDto {
   @IsOptional()
-  identifierUber: string;
+  @ApiProperty({
+    required: false,
+    description: 'Uber identifier',
+    type: String,
+    example: 'Uber12345',
+  })
+  identifierUber?: string;
 
   @IsOptional()
-  identifierBolt: string;
+  @ApiProperty({
+    required: false,
+    description: 'Bolt identifier',
+    type: String,
+    example: 'Bolt12345',
+  })
+  identifierBolt?: string;
 
   @IsOptional()
-  identifierFreeNow: string;
+  @ApiProperty({
+    required: false,
+    description: 'FreeNow identifier',
+    type: String,
+    example: 'FreeNow12345',
+  })
+  identifierFreeNow?: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  @ApiProperty({
+    description: 'Entry date timestamp in Unix format',
+    type: Number,
+    example: 1622548800, // Example Unix timestamp
+  })
   entryDate: number;
 
   @IsOptional()
-  @IsNumber()
-  endOfWork: number;
+  @ApiProperty({
+    required: false,
+    description: 'End of work timestamp in Unix format',
+    type: Number,
+    example: 1672531199, // Example Unix timestamp
+  })
+  endOfWork?: number;
 }
