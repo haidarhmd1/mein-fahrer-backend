@@ -7,7 +7,7 @@ Welcome to MeinFahrer Backend, a NestJS project aimed at creating APIs for the M
 ### 1. Clone the Repository:
 
 ```bash
-$ git clone <repository_url>
+$ git clone git@github.com:haidarhmd1/mein-fahrer-backend.git
 ```
 
 ### 2. Install Dependencies:
