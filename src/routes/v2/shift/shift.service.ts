@@ -64,4 +64,20 @@ export class ShiftService {
 
     return shifts;
   }
+
+  async findAllShiftsByUser(userCompanies: UserCompany[]): Promise<any[]> {
+    const shifts = await Promise.all(
+      userCompanies.map(async (userCompany) => {
+        const companyShifts = await this.shiftRepository.find({
+          where: { userCompany: { id: userCompany.id } },
+        });
+        return companyShifts.map((shift) => ({
+          ...shift,
+          companyId: userCompany.company.id,
+        }));
+      }),
+    );
+
+    return shifts.flat();
+  }
 }

@@ -83,7 +83,7 @@ export class ShiftController {
   }
 
   @Get('/users/:userId')
-  @ApiOperation({ summary: 'Get shifts by user ID' })
+  @ApiOperation({ summary: 'Get all shifts by user ID' })
   @ApiOkResponse({ description: 'Shifts retrieved successfully' })
   async findShiftsByUser(@Param('userId') userId: string) {
     const user = await this.userService.findOne(userId);
@@ -91,8 +91,34 @@ export class ShiftController {
       throw new NotFoundException('User not found');
     }
 
-    const { id: userCompanyId } =
+    const userCompanies =
+      await this.userCompanyService.findCompaniesByUser(userId);
+    if (!userCompanies.length) {
+      throw new NotFoundException('No companies found for this user');
+    }
+
+    return await this.shiftService.findAllShiftsByUser(userCompanies);
+  }
+
+  @Get('/users/:userId/company')
+  @ApiOperation({
+    summary: 'Get shifts of a user by company they are currently active at',
+  })
+  @ApiOkResponse({ description: 'Shifts retrieved successfully' })
+  async findShiftsByUserAndCompany(@Param('userId') userId: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const userCompany =
       await this.userCompanyService.findUserByActiveCompany(userId);
-    return await this.shiftService.findShiftsByUser(userCompanyId);
+    if (!userCompany || !userCompany.isUserActive) {
+      throw new NotFoundException(
+        'User is not active in the specified company',
+      );
+    }
+
+    return await this.shiftService.findShiftsByUser(userCompany.id);
   }
 }

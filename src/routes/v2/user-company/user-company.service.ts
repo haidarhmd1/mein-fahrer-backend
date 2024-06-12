@@ -31,8 +31,6 @@ export class UserCompanyService {
         },
       });
 
-    console.log('isUserToCompanyActiveExists', isUserToCompanyActiveExists);
-
     if (isUserToCompanyActiveExists) {
       throw new BadRequestException(
         'An entry associated with an active user already exists',
@@ -95,11 +93,19 @@ export class UserCompanyService {
   }
 
   async findUserByActiveCompany(userId: string): Promise<UserCompany> {
-    return await this.userCompanyRepository.findOne({
+    const activeUserCompany = await this.userCompanyRepository.findOne({
       where: {
         user: { id: userId },
         isUserActive: true,
       },
     });
+
+    if (!activeUserCompany) {
+      throw new NotFoundException(
+        `No active user found with the following: ${userId}`,
+      );
+    }
+
+    return activeUserCompany;
   }
 }
