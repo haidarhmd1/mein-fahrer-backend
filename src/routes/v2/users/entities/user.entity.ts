@@ -1,4 +1,9 @@
-import { IsEmail, IsNotEmpty, IsPhoneNumber } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+} from 'class-validator';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -29,6 +34,10 @@ export class User extends BaseEntity {
 
   @Column('simple-array', { nullable: true })
   onesignal_identifier: string[];
+
+  @Column({ nullable: true })
+  @IsOptional()
+  user_avatar: string;
 
   @Column({ unique: true })
   @IsNotEmpty()

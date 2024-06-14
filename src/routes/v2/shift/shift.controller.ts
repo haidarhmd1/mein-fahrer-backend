@@ -8,6 +8,10 @@ import {
   Delete,
   NotFoundException,
   UseGuards,
+  UseInterceptors,
+  UploadedFiles,
+  InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ShiftService } from './shift.service';
 import { CreateShiftDto } from './dto/create-shift.dto';
@@ -21,7 +25,9 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
+  ApiConsumes,
 } from '@nestjs/swagger';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('shifts')
@@ -36,11 +42,30 @@ export class ShiftController {
   ) {}
 
   @Post()
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      {
+        name: 'pictures_shift_start',
+        maxCount: 1,
+      },
+      {
+        name: 'pictures_shift_end',
+        maxCount: 1,
+      },
+    ]),
+  )
   @ApiOperation({ summary: 'Create a shift' })
   @ApiOkResponse({ description: 'Shift created successfully' })
-  async create(@Body() createShiftDto: CreateShiftDto) {
+  @ApiConsumes('multipart/form-data')
+  async create(
+    @Body() createShiftDto: CreateShiftDto,
+    @UploadedFiles()
+    files: {
+      pictures_shift_start: Express.Multer.File[];
+      pictures_shift_end: Express.Multer.File[];
+    },
+  ) {
     const { carId, userCompanyId } = createShiftDto;
-
     const car = await this.carService.findOne(carId);
     const userCompany = await this.userCompanyService.findOne(userCompanyId);
 
@@ -48,7 +73,19 @@ export class ShiftController {
       throw new NotFoundException('Car or userCompany not found');
     }
 
-    return await this.shiftService.create(createShiftDto, userCompany, car);
+    try {
+      return await this.shiftService.create(
+        createShiftDto,
+        userCompany,
+        car,
+        files,
+      );
+    } catch (error) {
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new BadRequestException('Failed to create shift');
+    }
   }
 
   @Get()
@@ -66,13 +103,32 @@ export class ShiftController {
   }
 
   @Patch(':id')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'pictures_shift_start', maxCount: 1 },
+      { name: 'pictures_shift_end', maxCount: 1 },
+    ]),
+  )
   @ApiOperation({ summary: 'Update a shift by ID' })
   @ApiOkResponse({ description: 'Shift updated successfully' })
+  @ApiConsumes('multipart/form-data')
   async update(
     @Param('id') id: string,
     @Body() updateShiftDto: UpdateShiftDto,
+    @UploadedFiles()
+    files: {
+      pictures_shift_start?: Express.Multer.File[];
+      pictures_shift_end?: Express.Multer.File[];
+    },
   ) {
-    return await this.shiftService.update(id, updateShiftDto);
+    try {
+      return await this.shiftService.update(id, updateShiftDto, files);
+    } catch (error) {
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new BadRequestException('Failed to update shift');
+    }
   }
 
   @Delete(':id')

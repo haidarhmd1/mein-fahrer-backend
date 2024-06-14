@@ -15,7 +15,6 @@ import { UserCompanyService } from './user-company.service';
 import { CompanyService } from '../company/company.service';
 import { UsersService } from '../users/users.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { UserGuard } from 'src/common/guards/user.guard';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -23,7 +22,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
-@UseGuards(JwtAuthGuard, UserGuard)
+@UseGuards(JwtAuthGuard)
 @ApiTags('user-company')
 @ApiBearerAuth()
 @Controller('user-company')
@@ -68,6 +67,7 @@ export class UserCompanyController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a user-company association by ID' })
   @ApiOkResponse({
+    status: 201,
     description: 'User-company association retrieved successfully',
   })
   async findOne(@Param('id') id: string) {

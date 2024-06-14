@@ -1,23 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
-  IsNotEmpty,
   IsPhoneNumber,
   IsOptional,
-  IsUUID,
   IsEnum,
   IsString,
 } from 'class-validator';
 import { FamilyStatus, GenderRole, UserRole } from 'src/common/types/user';
 
 export class CreateUserDto {
-  @ApiProperty({
-    description: 'Unique identifier for the user',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
-  @IsUUID()
-  id: string;
-
   @ApiProperty({
     description: 'First name of the user',
     required: false,
@@ -47,12 +38,19 @@ export class CreateUserDto {
   onesignal_identifier?: string[];
 
   @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'Avatar / profile picture of the user',
+  })
+  user_avatar: string;
+
+  @ApiProperty({
     description: 'Email of the user',
     example: 'john.doe@example.com',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @ApiProperty({
     description: 'Phone number of the user',
@@ -91,7 +89,7 @@ export class CreateUserDto {
   nationality?: string;
 
   @ApiProperty({ description: 'Password for the user', example: 'password123' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   password: string;
 
@@ -118,49 +116,4 @@ export class CreateUserDto {
   })
   @IsEnum(UserRole)
   role: UserRole;
-
-  @ApiProperty({
-    description: 'Work information ID',
-    required: false,
-    example: '123e4567-e89b-12d3-a456-426614174001',
-  })
-  @IsOptional()
-  @IsUUID()
-  workInformationId?: string;
-
-  @ApiProperty({
-    description: 'Banking information ID',
-    required: false,
-    example: '123e4567-e89b-12d3-a456-426614174002',
-  })
-  @IsOptional()
-  @IsUUID()
-  bankingInformationId?: string;
-
-  @ApiProperty({
-    description: 'Driving license information ID',
-    required: false,
-    example: '123e4567-e89b-12d3-a456-426614174003',
-  })
-  @IsOptional()
-  @IsUUID()
-  drivingLicenseInformationId?: string;
-
-  @ApiProperty({
-    description: 'Tax insurance information ID',
-    required: false,
-    example: '123e4567-e89b-12d3-a456-426614174004',
-  })
-  @IsOptional()
-  @IsUUID()
-  taxInsuranceInformationId?: string;
-
-  @ApiProperty({
-    description: 'Car maintenance ID',
-    required: false,
-    example: '123e4567-e89b-12d3-a456-426614174005',
-  })
-  @IsOptional()
-  @IsUUID()
-  carMaintenanceId?: string;
 }

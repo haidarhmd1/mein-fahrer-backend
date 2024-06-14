@@ -10,23 +10,33 @@ import { Shift } from './entities/shift.entity';
 import { Repository } from 'typeorm';
 import { UserCompany } from '../user-company/entities/user-company.entity';
 import { Car } from '../cars/entities/car.entity';
+import { AWSS3HelperService } from 'src/common/services/aws-s3/aws-s3.service';
 
 @Injectable()
 export class ShiftService {
   constructor(
     @InjectRepository(Shift)
     private readonly shiftRepository: Repository<Shift>,
+    private readonly awsS3HelperService: AWSS3HelperService,
   ) {}
 
   async create(
     createShiftDto: CreateShiftDto,
     userCompany: UserCompany,
     car: Car,
+    files: {
+      pictures_shift_start: Express.Multer.File[];
+      pictures_shift_end: Express.Multer.File[];
+    },
   ): Promise<Shift> {
+    const uploadedFiles = await this.awsS3HelperService.uploadFilesToS3(files);
+
     const shift = this.shiftRepository.create({
       ...createShiftDto,
       userCompany,
       car,
+      pictures_shift_start: uploadedFiles.pictures_shift_start.join(','),
+      pictures_shift_end: uploadedFiles.pictures_shift_end.join(','),
     });
     return await this.shiftRepository.save(shift);
   }
@@ -43,8 +53,29 @@ export class ShiftService {
     return shift;
   }
 
-  async update(id: string, updateShiftDto: UpdateShiftDto): Promise<Shift> {
+  async update(
+    id: string,
+    updateShiftDto: UpdateShiftDto,
+    files?: {
+      pictures_shift_start?: Express.Multer.File[];
+      pictures_shift_end?: Express.Multer.File[];
+    },
+  ): Promise<Shift> {
     const shift = await this.findOne(id);
+
+    if (files) {
+      const uploadedFiles =
+        await this.awsS3HelperService.uploadFilesToS3(files);
+      if (uploadedFiles.pictures_shift_start) {
+        updateShiftDto.pictures_shift_start =
+          uploadedFiles.pictures_shift_start.join(',');
+      }
+      if (uploadedFiles.pictures_shift_end) {
+        updateShiftDto.pictures_shift_end =
+          uploadedFiles.pictures_shift_end.join(',');
+      }
+    }
+
     Object.assign(shift, updateShiftDto);
     await this.shiftRepository.save(shift);
     return shift;

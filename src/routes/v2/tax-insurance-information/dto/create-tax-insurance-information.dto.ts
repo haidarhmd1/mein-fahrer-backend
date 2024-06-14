@@ -1,14 +1,7 @@
-import { IsString, IsUUID, IsBoolean } from 'class-validator';
+import { IsString, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTaxInsuranceInformationDto {
-  @ApiProperty({
-    description: 'Unique identifier for the tax insurance information',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
-  @IsUUID()
-  id: string;
-
   @ApiProperty({ description: 'Tax class', example: 'Class A' })
   @IsString()
   taxClass: string;
@@ -32,11 +25,4 @@ export class CreateTaxInsuranceInformationDto {
   @ApiProperty({ description: 'Child allowance', example: true })
   @IsBoolean()
   childAllowance: boolean;
-
-  @ApiProperty({
-    description: 'User ID associated with the tax insurance information',
-    example: '123e4567-e89b-12d3-a456-426614174001',
-  })
-  @IsUUID()
-  userId: string;
 }

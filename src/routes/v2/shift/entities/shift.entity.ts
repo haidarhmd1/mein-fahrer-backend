@@ -11,6 +11,7 @@ import {
 import { Car } from '../../cars/entities/car.entity';
 import { ShiftType } from 'src/common/types/shift';
 import { UserCompany } from '../../user-company/entities/user-company.entity';
+import { IsOptional } from 'class-validator';
 
 @Entity()
 export class Shift extends BaseEntity {
@@ -23,25 +24,28 @@ export class Shift extends BaseEntity {
   @ManyToOne(() => Car)
   car: Car;
 
-  @Column({ type: 'bigint' }) // Store Unix timestamp as bigint
+  @Column({ type: 'bigint' })
   date_and_time_start: number;
 
-  @Column({ type: 'bigint' }) // Store Unix timestamp as bigint
+  @Column({ type: 'bigint', nullable: true })
+  @IsOptional()
   date_and_time_end: number;
 
-  @Column({ type: 'double precision' })
+  @Column()
   km_start: number;
 
-  @Column({ type: 'double precision' })
+  @Column({ nullable: true })
+  @IsOptional()
   km_end: number;
 
   @Column()
   pictures_shift_start: string;
 
-  @Column()
+  @Column({ nullable: true })
+  @IsOptional()
   pictures_shift_end: string;
 
-  @Column({ type: 'json' }) // Adjust to use 'json' type for storing JSON objects
+  @Column({ type: 'json' })
   place_of_shift_start: object;
 
   @Column({

@@ -6,6 +6,10 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,8 +24,10 @@ import {
   ApiOperation,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -57,6 +63,8 @@ export class UsersController {
 
   @UseGuards(SelfGuard)
   @Patch(':id')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('user_avatar'))
   @ApiOkResponse({
     description: 'User updated successfully',
     type: CreateUserDto,
@@ -64,8 +72,19 @@ export class UsersController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiOperation({ summary: 'Update user by ID (Self or Admin)' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() user_avatar: Express.Multer.File,
+  ) {
+    try {
+      return this.usersService.update(id, updateUserDto, user_avatar);
+    } catch (error) {
+      if (error instanceof InternalServerErrorException) {
+        throw new InternalServerErrorException(error.message);
+      }
+      throw new BadRequestException('Failed to create shift');
+    }
   }
 
   @Roles(UserRole.ADMIN)

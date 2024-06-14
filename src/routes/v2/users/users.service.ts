@@ -10,12 +10,14 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { SALT_ROUNDS } from 'src/common/constants/constants';
 import { UserRole } from 'src/common/types/user';
+import { AWSS3HelperService } from 'src/common/services/aws-s3/aws-s3.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private readonly awsS3HelperService: AWSS3HelperService,
   ) {}
 
   async create(
@@ -92,8 +94,19 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    user_avatar?: Express.Multer.File,
+  ): Promise<User> {
     const user = await this.findOne(id);
+
+    if (user_avatar) {
+      const uploadedFile =
+        await this.awsS3HelperService.uploadSingleFileToS3(user_avatar);
+      updateUserDto.user_avatar = uploadedFile;
+    }
+
     Object.assign(user, updateUserDto);
     await this.usersRepository.save(user);
     return user;

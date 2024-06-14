@@ -13,7 +13,7 @@ export class CreateCarMaintenanceDto {
 
   @ApiProperty({
     description: 'Date of the car during maintenance (UNIX timestamp)',
-    example: 1623399494463,
+    example: 1718351982,
     required: false,
   })
   @IsOptional()
@@ -22,7 +22,7 @@ export class CreateCarMaintenanceDto {
 
   @ApiProperty({
     description: 'Date of the last oil change (UNIX timestamp)',
-    example: 1623399494463,
+    example: 1718351982,
     required: false,
   })
   @IsOptional()
@@ -31,7 +31,7 @@ export class CreateCarMaintenanceDto {
 
   @ApiProperty({
     description: 'Date of the next oil change (UNIX timestamp)',
-    example: 1623399494463,
+    example: 1718351982,
     required: false,
   })
   @IsOptional()
